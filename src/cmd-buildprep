@@ -138,7 +138,11 @@ class S3Fetcher(Fetcher):
         destbucket, destkey = dest[len("s3://"):].split('/', 1)
         source = {'Bucket': srcbucket, 'Key': srckey}
         dest = {'Bucket': destbucket, 'Key': destkey}
-        s3.meta.client.copy(source, dest)
+        s3.meta.client.copy(
+            CopySource=source, dest,
+            Bucket=destbucket,
+            Key=destkey
+        )
 
     def exists_impl(self, url):
         assert url.startswith("s3://")
