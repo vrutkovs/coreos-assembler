@@ -25,7 +25,6 @@ EOF
 # Parse options
 FORCE=
 FORCE_IMAGE=
-SKIP_PRUNE=0
 VERSION=
 PARENT=
 rc=0
@@ -46,9 +45,6 @@ while true; do
             ;;
         --force-image)
             FORCE_IMAGE=1
-            ;;
-        --skip-prune)
-            SKIP_PRUNE=1
             ;;
         --version)
             shift
@@ -403,15 +399,7 @@ mkdir -p "${builddir}"
 mv -T "${tmp_builddir}" "${builddir}"
 # Replace the latest link
 ln -Tsf "${buildid}" builds/latest
-# Update builds.json
-# the variables passed to `prune_builds` end up single quoted and
-# python treats them as literals, so we workaround this by duplicating
-# the command  ¯\_(ツ)_/¯
-if [ "${SKIP_PRUNE}" == 1 ]; then
-    "${dn}"/prune_builds --workdir "${workdir}" --insert-only "${buildid}"
-else
-    "${dn}"/prune_builds --workdir "${workdir}"
-fi
+"${dn}"/bump-timestamp --workdir "${workdir}"
 rm builds/.build-commit
 
 # and finally, build the specified targets
