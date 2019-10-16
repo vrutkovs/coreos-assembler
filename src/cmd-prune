@@ -24,8 +24,6 @@ parser = argparse.ArgumentParser(prog="coreos-assembler prune")
 parser.add_argument("--workdir", default='.', help="Path to workdir")
 parser.add_argument("--dry-run", help="Don't actually delete anything",
                     action='store_true')
-parser.add_argument("--insert-only", metavar="BUILDID", action='store',
-                    help="Append a new latest build, do not prune")
 keep_options = parser.add_mutually_exclusive_group()
 keep_options.add_argument("--keep-last-n", type=int, metavar="N",
                           default=DEFAULT_KEEP_LAST_N,
@@ -49,13 +47,6 @@ print("prune: skip_pruning: {skip_pruning}")
 builds = Builds(args.workdir)
 # collect all builds being pointed to by tags
 tagged_builds = set([tag['target'] for tag in builds.raw().get('tags', [])])
-
-# Handle --insert-only
-if args.insert_only:
-    builds.insert_build(args.insert_only)
-    builds.flush()
-    print("prune: --insert-only completed")
-    sys.exit(0)
 
 scanned_builds = []
 for build in builds.raw()["builds"]:
