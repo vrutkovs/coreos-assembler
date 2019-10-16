@@ -10,12 +10,18 @@ import sys
 from cosalib.builds import Builds
 from cosalib.prune import fetch_build_meta, get_unreferenced_s3_builds, delete_build
 
-parser = argparse.ArgumentParser(prog="coreos-assembler cleanup-bucket")
+parser = argparse.ArgumentParser(prog="coreos-assembler remote-prune")
 parser.add_argument("--workdir", default='.', help="Path to workdir")
 parser.add_argument("--dry-run", help="Don't actually delete anything",
                     action='store_true')
-parser.add_argument("--bucket", help="S3 bucket")
-parser.add_argument("--prefix", help="S3 prefix")
+
+subparsers = parser.add_subparsers(dest='cmd', title='subcommands')
+subparsers.required = True
+
+s3 = subparsers.add_parser('s3', help='Prune s3 buckets')
+s3.add_argument("--bucket", help="Bucket name")
+s3.add_argument("--prefix", help="Key prefix")
+
 args = parser.parse_args()
 
 builds = Builds(args.workdir)
