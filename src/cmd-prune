@@ -4,16 +4,16 @@
     This script removes previous builds. DO NOT USE on production pipelines
 '''
 
+import argparse
 import os
 import sys
-import argparse
 
 
 from datetime import timedelta, datetime, timezone
+from shutil import rmtree
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from cosalib.builds import Builds
-from cosalib.prune import fetch_build_meta, delete_build
+from cosalib.builds import Builds, get_local_builds
 
 # Let's just hardcode this here for now
 DEFAULT_KEEP_LAST_N = 3
@@ -48,12 +48,8 @@ builds = Builds(args.workdir)
 # collect all builds being pointed to by tags
 tagged_builds = set([tag['target'] for tag in builds.raw().get('tags', [])])
 
-scanned_builds = []
-for build in builds.raw()["builds"]:
-    for arch in build['arches']:
-        build = fetch_build_meta(build['id'], arch)
-        if build:
-            scanned_builds.append(build)
+builds_dir = os.path.join(args.workdir, "builds")
+scanned_builds = get_local_builds(builds_dir)
 
 new_builds = []
 builds_to_delete = []
@@ -105,7 +101,7 @@ for build in builds_to_delete:
     print(f"Pruning {build}")
     if not args.dry_run:
         try:
-            delete_build(build)
+            rmtree(os.path.join(builds_dir, build.id))
         except Exception as e:
             error_during_pruning = True
             print(f"{e}")
