@@ -397,16 +397,22 @@ cd "${workdir}"
 # were interrupted between the rename() and linkat() below,
 # things would be inconsistent and future builds would fail
 # on the `mv`.
+
+echo "----"
+
 touch builds/.build-commit
 builddir=$(get_build_dir "${buildid}")
 mkdir -p "${builddir}"
 mv -T "${tmp_builddir}" "${builddir}"
 # Replace the latest link
 ln -Tsf "${buildid}" builds/latest
+echo "---- bump-timestamp ----"
 "${dn}"/bump-timestamp --workdir "${workdir}"
+echo "---- cmd-prune ----"
 if [ "${SKIP_PRUNE}" == 0 ]; then
   "${dn}"/cmd-prune --workdir "${workdir}"
 fi
+echo "---- done ----"
 rm builds/.build-commit
 
 # and finally, build the specified targets
