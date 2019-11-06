@@ -209,9 +209,8 @@ if [ "${remote_name}" != NONE ]; then
 fi
 ostree pull-local "$ostree" "$ref" --repo rootfs/ostree/repo $remote_arg
 ostree admin os-init "$os_name" --sysroot rootfs
-# Note that $ignition_firstboot is interpreted by grub at boot time,
-# *not* the shell here.  Hence the backslash escape.
-allkargs="\$ignition_firstboot $extrakargs"
+allkargs='root=/dev/disk/by-label/root rootflags=defaults,prjquota rw $ignition_firstboot'
+allkargs="$allkargs $extrakargs"
 kargsargs=""
 for karg in $allkargs
 do
