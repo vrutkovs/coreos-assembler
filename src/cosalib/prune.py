@@ -121,6 +121,18 @@ def delete_build(build, bucket, prefix, cloud_config, force=False):
             except Exception as e:
                 errors.append(e)
 
+    azure = build.images.get('azure')
+    if azure:
+        azure_image = azure.get('image')
+        print(f"Found azure image: {azure_image}")
+        # json_key = cloud_config.get('gcp', {}).get('json-key')
+        # project = cloud_config.get('gcp', {}).get('project')
+        # if gcp_image and json_key and project:
+        #     try:
+        #         remove_gcp_image(gcp_image, json_key, project)
+        #     except Exception as e:
+        #         errors.append(e)
+
     if len(errors) != 0:
         print(f"Found errors when removing build {build.id}:")
         for e in errors:
